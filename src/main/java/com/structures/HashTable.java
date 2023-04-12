@@ -7,10 +7,11 @@ class Node<K,V> {
         Node<K,V> nextNode;
 }
 class SuperHashMap<K,V> {
-        int size = 0;
+        static final int DEFAULT_LENGTH = 10;
         Node<K,V>[] data;
-        SuperHashMap (int length) {
-                data = (Node<K, V>[]) new Node[length];
+        int size = 0;
+        SuperHashMap () {
+                data = (Node<K, V>[]) new Node[DEFAULT_LENGTH];
         }
         public void put(K key, V value) {
                 int hash = key.hashCode();
@@ -19,7 +20,9 @@ class SuperHashMap<K,V> {
                 node.value = value;
                 node.key = key;
 
+
                 if (data[index] != null) {
+                        int bucketLength = 0;
                         Node<K, V> last = data[index];
                         for (Node<K, V> n = data[index]; n != null; n = n.nextNode) {
                                 if (n.key.equals(key)) {
@@ -27,12 +30,20 @@ class SuperHashMap<K,V> {
                                         break;
                                 }
                                 last = n;
+                                bucketLength += 1;
                         }
                         last.nextNode = node;
+                        if (bucketLength > 2) {
+                                rebuildArray();
+                        }
                 } else {
                         data[index] = node;
                 }
                 size += 1;
+        }
+
+        private void rebuildArray() {
+                // TODO Создать новый массив х2, запутать в новый массив старые значения.
         }
 
         public V get(K key) {
@@ -54,7 +65,7 @@ class SuperHashMap<K,V> {
 public class HashTable {
         public static void main(String[] args) {
         // String --> int
-        SuperHashMap<String, Integer> namesToAges = new SuperHashMap<>(5);
+        SuperHashMap<String, Integer> namesToAges = new SuperHashMap<>();
 
         namesToAges.put("Artem", 35);
         namesToAges.put("Barsik", 7);
